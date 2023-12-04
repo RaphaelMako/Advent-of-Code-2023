@@ -144,6 +144,18 @@ data = '''.....180.........230..........................218.....189......415....
 #Make the data into a 2d array. Seek numbers, iterate through the array until it reaches either a symbol or a . (to define the number)
 #If any part of the number is adjacent to a symbol it gets logged, if not it does not.
 
+testdata= '''467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
+'''
+
 #importing numpy
 import numpy as np
 
@@ -206,25 +218,71 @@ def whole_number(row, cell, data):
 
         
 #parsing through each cell
-total = 0
-for i, row in enumerate(data):
-    j = 0
-    while j < len(row):
-        if (not data[i][j].isdigit()):
-            j += 1
-            continue
-        else:
-            if (surrounding(i, j, data)):
-                whole_num = whole_number(i, j, data)
-                total += int(whole_num[0])
-                if (int(whole_num[1]) < len(row)):
-                    j = int(whole_num[1])
-                    continue
-                else:
-                    break
-            else:
+def part_one():
+    total = 0
+    for i, row in enumerate(data):
+        j = 0
+        while j < len(row):
+            if (not data[i][j].isdigit()):
                 j += 1
                 continue
+            else:
+                if (surrounding(i, j, data)):
+                    whole_num = whole_number(i, j, data)
+                    total += int(whole_num[0])
+                    if (int(whole_num[1]) < len(row)):
+                        j = int(whole_num[1])
+                        continue
+                    else:
+                        break
+                else:
+                    j += 1
+                    continue
+    print(total)
 
-print(total)
+# PART TWO
 
+def surrounding_num(row, cell, data):
+    number_count = 0
+    number_total = 1
+    for i in range(-1, 2):
+        j = -1
+        while (j < 2):
+            try:
+                neighbour = data[i + row][j + cell]
+                if (neighbour.isdigit()):
+                    number_count += 1
+                    whole_num = whole_number((i + row), (j + cell), data)
+
+                    number_total *= whole_num[0]
+                    
+                    if (int(whole_num[1]) < (cell + 2)):
+                        j = (cell - int(whole_num[1]) + 1)
+                        continue
+                    else:
+                        break
+                else:
+                    j += 1
+
+            except IndexError:
+                break
+
+        continue
+    
+    if (number_count == 2):
+        return number_total
+    else:
+        return 0
+
+def part_two():
+    total = 0
+    for i, row in enumerate(data):
+        for j, cell in enumerate(row):
+            if (not cell == '*'):
+                continue
+            else:
+                total += surrounding_num(i, j, data)
+                
+    print(total)
+
+part_two()
